@@ -12,7 +12,6 @@ export class CategoriasService {
 
     constructor(
         @InjectModel('Categoria') private readonly categoriaModel: Model<Categoria>,
-        private readonly jogadoresService: JogadoresService,
     ){
         
     }
@@ -23,9 +22,7 @@ export class CategoriasService {
 
         const categoriaExistente = await this.categoriaModel.findOne({categoria}).exec();
 
-        if(categoriaExistente){
-            throw new BadRequestException("Categoria já cadastrada");
-        }
+        if(categoriaExistente) throw new BadRequestException("Categoria já cadastrada");
 
         const categoriaCriada = new this.categoriaModel(criarCategoriaDto);
 
@@ -40,9 +37,7 @@ export class CategoriasService {
 
         const categoriaEncontrada = await this.categoriaModel.findOne({categoria}).populate("jogadores").exec();
         
-        if(!categoriaEncontrada){
-            throw new NotFoundException("Categoria não encontrada");
-        }
+        if(!categoriaEncontrada) throw new NotFoundException("Categoria não encontrada");
 
         return categoriaEncontrada;
     }
@@ -51,34 +46,43 @@ export class CategoriasService {
 
         const categoriaEncontrada = await this.categoriaModel.findOne({categoria}).exec();
 
-        if(!categoriaEncontrada){
-            throw new NotFoundException("Categoria não encontrada");
-        }
+        if(!categoriaEncontrada) throw new NotFoundException("Categoria não encontrada");
 
         await this.categoriaModel.findOneAndUpdate({categoria}, {$set: atualizarCategoriaDto}).exec();
 
     }
 
     async atribuirJogadorCategoria(params: string[]): Promise<void>{
+
         const categoria = params['categoria'];
         const idJogador = params['idJogador'];
 
         const categoriaEncontrada = await this.categoriaModel.findOne({categoria}).exec();
                                                 
-        if(!categoriaEncontrada){
-            throw new NotFoundException("Categoria não encontrada");
-        }
+        if(!categoriaEncontrada) throw new NotFoundException("Categoria não encontrada");
 
         const jogadorJaPertence = await this.categoriaModel
                                         .find({categoria})
                                         .where('jogadores')
                                         .in(idJogador).exec();
-        if(jogadorJaPertence.length > 0){
-            throw new BadRequestException("Jogador já cadastrado na categoria");
-        }
+
+        if(jogadorJaPertence.length > 0) throw new BadRequestException("Jogador já cadastrado na categoria");
 
         categoriaEncontrada.jogadores.push(idJogador);
         await this.categoriaModel.findOneAndUpdate({categoria}, {$set: categoriaEncontrada}).exec();
+
+    }
+
+    async buscarCategoriaDoJogador(idJogador: string): Promise<Categoria>{
+
+        const categoriaJogador = await this.categoriaModel
+                                        .findOne()
+                                        .where('jogadores')
+                                        .in([idJogador]).exec();
+
+        if(!categoriaJogador) throw new NotFoundException("Categoria não encontrada");
+
+        return categoriaJogador;
 
     }
 

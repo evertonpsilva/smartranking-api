@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JogadoresModule } from './jogadores/jogadores.module';
 import { CategoriasModule } from './categorias/categorias.module';
-import { DesafiosModule } from './desafios/desafios.module';
 import { DB_KEY } from 'db-key';
+import { DesafiosModule } from './desafios/desafios.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { DB_KEY } from 'db-key';
     ), 
     CategoriasModule,
     JogadoresModule,
-    DesafiosModule, 
+    DesafiosModule,
   ],
   controllers: [],
   providers: [],

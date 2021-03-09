@@ -12,32 +12,29 @@ export class JogadoresService {
     constructor(@InjectModel('Jogador') private readonly jogadorModel: Model<Jogador>){}
 
     async criarJogador(criarJogadorDto: CriarJogadorDto): Promise<Jogador>{
+        
         const {email} = criarJogadorDto;
         
         const jogadorExistente = await this.jogadorModel.findOne({email}).exec();
 
-        if(jogadorExistente){
-            throw new BadRequestException(`Email ${email} já cadastrado`);
-        }
+        if(jogadorExistente) throw new BadRequestException(`Email ${email} já cadastrado`);
 
         const jogadorCriado = new this.jogadorModel(criarJogadorDto);
 
         try{
             return await jogadorCriado.save();
         }catch(erro){
-            if(erro.code == 11000){
-                throw new BadRequestException('Telefone já cadastrado anteriormente');
-            }
+            if(erro.code == 11000)throw new BadRequestException('Telefone já cadastrado anteriormente');
+
             throw new BadRequestException('Ocorreu um erro. Verifique seus dados e tente novamente');
         }
+
     }
 
     async atualizarJogador(_id: string, atualizarJogadorDto: AtualizarJogadorDto): Promise<void>{
         const jogadorExistente = await this.jogadorModel.findOne({_id}).exec();
 
-        if(!jogadorExistente){
-            throw new NotFoundException("Jogador não encontrado");
-        }
+        if(!jogadorExistente)throw new NotFoundException("Jogador não encontrado");
         await this.jogadorModel.findOneAndUpdate(
             {_id: _id}, 
             {$set: atualizarJogadorDto}
@@ -48,21 +45,31 @@ export class JogadoresService {
         return await this.jogadorModel.find().exec();
     }
 
+    async consultarJogadoresPorIds(ids: string[]): Promise<Jogador[]>{
+
+        const jogadores = await this.jogadorModel.find({_id: {$in: ids}}).exec();
+
+        if(!jogadores || jogadores.length < ids.length)throw new BadRequestException("Não foi possível encontrar todos os jogadores. Verifique o id e tente novamente");
+
+        return jogadores;
+
+    }
+
     async consultarJogadorPeloId(_id: string): Promise<Jogador>{
 
         const jogadorEncontrado = await this.jogadorModel.findOne({_id}).exec();
-        if(!jogadorEncontrado){
-            throw new NotFoundException("Jogador não encontrado");
-        }
+
+        if(!jogadorEncontrado)throw new NotFoundException("Jogador não encontrado");
+
         return jogadorEncontrado;
+
     }
 
     async deletarJogador(_id: string): Promise<any>{
 
         const jogadorEncontrado = await this.jogadorModel.findOne({_id}).exec();
-        if(!jogadorEncontrado){
-            throw new NotFoundException("Jogador não encontrado");
-        }
+
+        if(!jogadorEncontrado)throw new NotFoundException("Jogador não encontrado");
 
         return await this.jogadorModel.deleteOne({_id: _id}).exec();
     }
