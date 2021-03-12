@@ -1,4 +1,4 @@
-import { IsDateString, IsIn, IsNotEmpty } from "class-validator";
+import { IsDateString, IsIn, IsNotEmpty, IsOptional } from "class-validator";
 import { DesafioStatus } from "../enums/desafio-status.enum";
 
 export class AtualizarDesafioDto{
@@ -8,6 +8,6 @@ export class AtualizarDesafioDto{
     dataHoraDesafio: Date;
 
     @IsIn([DesafioStatus.ACEITO, DesafioStatus.NEGADO, DesafioStatus.CANCELADO, ])
-    status: DesafioStatus
+    status: DesafioStatus;
 
 }

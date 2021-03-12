@@ -6,6 +6,7 @@ import { CategoriasService } from 'src/categorias/categorias.service';
 import { JogadoresService } from 'src/jogadores/jogadores.service';
 import { AtualizarDesafioDto } from './dtos/atualizar-desafio.dto';
 import { CriarDesafioDto } from './dtos/criar-desafio.dto';
+import { FinalizarDesafioDto } from './dtos/finalizar-desafio.dto';
 import { DesafioStatus } from './enums/desafio-status.enum';
 import { Desafio } from './interfaces/desafio.interface';
 
@@ -18,6 +19,18 @@ export class DesafiosService {
         private readonly categoriasService: CategoriasService,
     ){
 
+    }
+
+    async buscarDesafioPorId(_id: string): Promise<Desafio>{
+
+        const desafioCadastrado = await this.desafioModel.findOne({_id: _id})
+                                    .populate("jogadores")
+                                    .populate("solicitante")
+                                    .exec();
+
+        if(!desafioCadastrado) throw new BadRequestException("Desafio não encontrado");
+
+        return desafioCadastrado;
     }
 
     async criarDesafio(criarDesafioDto: CriarDesafioDto): Promise<Desafio>{
@@ -58,6 +71,16 @@ export class DesafiosService {
         if(!desafioEncontrado) throw new BadRequestException("Desafio não encontrado");
 
         await this.desafioModel.findOneAndUpdate({_id}, {$set: atualizarDesafioDto}).exec();
+
+    }
+
+    async finalizarDesafio(_id: string, finalizarDesafioDto: FinalizarDesafioDto): Promise<Desafio>{
+
+        const desafioEncontrado = await this.desafioModel.findOne({_id: _id}).exec();
+
+        if(!desafioEncontrado) throw new BadRequestException("Desafio não encontrado");
+
+        return await this.desafioModel.findByIdAndUpdate({_id}, {$set: finalizarDesafioDto}).exec();
 
     }
 

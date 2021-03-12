@@ -19,6 +19,13 @@ export class DesafiosController {
         return await this.desafiosService.criarDesafio(criarDesafioDto);
     }
 
+    @Get('/:_id')
+    async consultarDesafioPorId(
+        @Param('_id') _id: string,
+    ): Promise<Desafio>{
+        return await this.desafiosService.buscarDesafioPorId(_id);
+    }
+
     @Get()
     async consultarDesafios(
         @Query('idJogador') idJogador: string,

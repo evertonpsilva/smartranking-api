@@ -1,5 +1,6 @@
 import { Document } from "mongoose";
 import { Jogador } from "src/jogadores/interfaces/jogador.interface";
+import { Partida } from "src/partidas/interfaces/partida.interface";
 import { DesafioStatus } from "../enums/desafio-status.enum";
 
 export interface Desafio extends Document{
@@ -14,14 +15,6 @@ export interface Desafio extends Document{
     status: DesafioStatus;
 
 }
-
-export interface Partida extends Document{
-    categoria: string;
-    jogadores: Array<Jogador>;
-    def: Jogador;
-    resultado: Array<Resultado>
-}
-
 export interface Resultado{
     set: string;
 }

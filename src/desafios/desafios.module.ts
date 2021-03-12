@@ -14,5 +14,6 @@ import { JogadoresModule } from 'src/jogadores/jogadores.module';
   ], 
   controllers: [DesafiosController],
   providers: [DesafiosService],
+  exports: [DesafiosService]
 })
 export class DesafiosModule {}
